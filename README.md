@@ -5,12 +5,23 @@ The default implementation got a best run time of 0.03467s on my VM.
 
 ### Naive
 
-My naive implementation got a best run time of .0072s on my VM. It assumes that all quotes are between 3 and 5 digits, since all values in the quotes set are between 100 and 62951.
+This naive algorithm makes no assumptions about the length of the inputs, so it has to iterate over the length of the string to find the length. It then interprets each character as an ASCII code, subtracting 48 to get a digit.
 
-The ASCII code for 0 is 48, so interpreting a char as an ASCII value and subtracting 48 gives the int value. My code then checks the length by checking the 6th, 5th and 4th characters - if they are the null terminator, then the line is 5, 4 or 3 digits respectively.
+This algorithm takes about .012s on my VM. Unlike `atoi`, this algorithm doesn't work on strings with leading whitespace, which lets it avoid checking for and then stripping white space.
 
+My algorithm is linear in each string, but iterates twice over the length.
 ### Optimization
 
-Removing the "digits" array, and simply using the contents - `(lines[i][0]-48)` lets the compiler skip moving a bunch of values around. This gets me down to .0046s, which is 63% of the original time.
+#### Overall
+The best run time of 1000 trials of my optimized algorithm was 4.76ms, which is about 3x faster than my naive version. 
 
-Examining the math calculation, the multiplication can be expanded, but this makes it worse by .0005s or so.
+Analyzing the data, all strings are between 100 and 62951, so 3, 4 or 5 digits. Thus, it is possible to replace both loops with a simple if /else if / else clause.
+
+The compiler does a pretty good job with the actual math, so I left it as is. Attempting to expand it myself made it worse by roughly .0005s, probably because the compiler is able to
+
+Using an if / else chain to determine the length of the line, rather than 3 if statements, improves performance by a smidge - about .0002 or .0003 seconds, since the other conditions are not checked.
+
+Finally, the weird bit:
+The first if/else if/else structure establishes the length, and the second uses the length to decide which calculation to do. Combining these into a single if/else if/else structure is worse - 4.5 milliseconds vs 5.8 milliseconds...
+
+I don't really understand why this would be.
